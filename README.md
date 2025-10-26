@@ -28,7 +28,7 @@ Your Excel file should have the following columns (first row as headers):
 
 | Name | Emp ID | Designation | DOJ | UAN No | ESI No | CL Taken | Balance CL | Loss of Pay | Total Payable Days | Basic Pay | DA | HRA | Other allowance | EPF | ESI / Health Insurance | Professional Tax | Loan Recovery | Month | Year |
 |------|--------|-------------|-----|--------|--------|----------|------------|-------------|-------------------|-----------|----|----- |----------------|-----|----------------------|------------------|---------------|-------|------|
-| Mr.Paramasivam | MG030 | GET I - Software Development | 1-Jul-25 | 102249610512 | | 0 | 2 | 0 | 30 | 11600 | 5800 | 5800 | 0 | 1800 | 0 | 200 | 0 | September | 2025 |
+| Mr.Paramasivam | MGXXX | GET I - Software Development | XX-XXX-XX | XXXXXXXXX | | 0 | 2 | 0 | 30 | XXXXX | 5800 | 5800 | 0 | 1800 | 0 | 200 | 0 | XXXX | XXXX |
 
 **Column Details:**
 - **Name**: Employee full name with title (Mr./Ms.)
