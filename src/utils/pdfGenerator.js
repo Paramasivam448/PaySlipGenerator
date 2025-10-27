@@ -1,82 +1,3 @@
-// import jsPDF from 'jspdf';
-
-// export const generatePayslipPDF = (employee, month, year) => {
-//   try {
-//     const pdf = new jsPDF();
-    
-//     // Simple test first
-//     pdf.setFontSize(20);
-//     pdf.text('MAGA TECH GRAMAM PVT LTD', 20, 30);
-    
-//     pdf.setFontSize(16);
-//     pdf.text(`Pay Slip for the month of ${month} ${year}`, 20, 50);
-    
-//     pdf.setFontSize(12);
-//     let y = 80;
-    
-//     // Employee basic info
-//     pdf.text(`Name: ${employee['Name'] || 'N/A'}`, 20, y);
-//     y += 10;
-//     pdf.text(`Emp ID: ${employee['Emp ID'] || 'N/A'}`, 20, y);
-//     y += 10;
-//     pdf.text(`Designation: ${employee['Designation'] || 'N/A'}`, 20, y);
-//     y += 10;
-//     pdf.text(`DOJ: ${employee['DOJ'] || 'N/A'}`, 20, y);
-//     y += 10;
-//     pdf.text(`UAN No: ${employee['UAN No'] || 'N/A'}`, 20, y);
-//     y += 20;
-    
-//     // Salary details
-//     pdf.text('Salary Details:', 20, y);
-//     y += 15;
-//     pdf.text(`Basic Pay: Rs. ${employee['Basic Pay'] || '0'}`, 20, y);
-//     y += 10;
-//     pdf.text(`DA: Rs. ${employee['DA'] || '0'}`, 20, y);
-//     y += 10;
-//     pdf.text(`HRA: Rs. ${employee['HRA'] || '0'}`, 20, y);
-//     y += 10;
-//     pdf.text(`Other Allowance: Rs. ${employee['Other allowance'] || '0'}`, 20, y);
-//     y += 20;
-    
-//     // Deductions
-//     pdf.text('Deductions:', 20, y);
-//     y += 15;
-//     pdf.text(`EPF: Rs. ${employee['EPF'] || '0'}`, 20, y);
-//     y += 10;
-//     pdf.text(`Professional Tax: Rs. ${employee['Professional Tax'] || '0'}`, 20, y);
-//     y += 20;
-    
-//     // Net Pay calculation
-//     const basicPay = parseInt(employee['Basic Pay'] || 0);
-//     const da = parseInt(employee['DA'] || 0);
-//     const hra = parseInt(employee['HRA'] || 0);
-//     const otherAllowance = parseInt(employee['Other allowance'] || 0);
-//     const epf = parseInt(employee['EPF'] || 0);
-//     const profTax = parseInt(employee['Professional Tax'] || 0);
-    
-//     const grossSalary = basicPay + da + hra + otherAllowance;
-//     const totalDeductions = epf + profTax;
-//     const netPay = grossSalary - totalDeductions;
-    
-//     pdf.setFontSize(14);
-//     pdf.text(`Net Pay: Rs. ${netPay}`, 20, y);
-    
-//     y += 30;
-//     pdf.setFontSize(10);
-//     pdf.text('"This is a System generated Pay slip. Hence, Signature is not required"', 20, y);
-    
-//     // Download
-//     const fileName = `Payslip_${employee['Name'] || 'Unknown'}_${month}_${year}.pdf`;
-//     pdf.save(fileName);
-    
-//   } catch (error) {
-//     console.error('PDF Generation Error:', error);
-//     alert('Error generating PDF: ' + error.message);
-//   }
-// };
-
-// HTML template for payslip
-
 
 const createPayslipHTML = (employee, month, year) => {
   const basicPay = parseInt(employee['Basic Pay'] || 0);
@@ -289,155 +210,7 @@ const createPayslipHTML = (employee, month, year) => {
 
 
 
-// Canvas-based PDF generation
-export const generateCanvasPDF = (employee, month, year) => {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  
-  // High resolution for better quality
-  const scale = 3; // 3x resolution
-  canvas.width = 595 * scale;
-  canvas.height = 842 * scale;
-  canvas.style.width = '595px';
-  canvas.style.height = '842px';
-  
-  // Scale context for high DPI
-  ctx.scale(scale, scale);
-  
-  // Enable text smoothing
-  ctx.textBaseline = 'top';
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-  
-  // White background
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, 595, 842);
-  
-  // Calculate values
-  const basicPay = parseInt(employee['Basic Pay'] || 0);
-  const da = parseInt(employee['DA'] || 0);
-  const hra = parseInt(employee['HRA'] || 0);
-  const otherAllowance = parseInt(employee['Other allowance'] || 0);
-  const epf = parseInt(employee['EPF'] || 0);
-  const profTax = parseInt(employee['Professional Tax'] || 0);
-  const loan = parseInt(employee['Loan Recovery'] || 0);
-  const esi = parseInt(employee['ESI / Health Insurance'] || 0);
-  
-  const grossSalary = basicPay + da + hra + otherAllowance;
-  const totalDeductions = epf + profTax + esi + loan;
-  const netPay = grossSalary - totalDeductions;
-  
-  let y = 50;
-  
-  // Header
-  ctx.fillStyle = '#f4b083';
-  ctx.fillRect(30, y, 535, 30);
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 16px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('MAGA TECH GRAMAM PVT LTD', 297, y + 20);
-  
-  y += 40;
-  ctx.font = '11px Arial, sans-serif';
-  ctx.fillText('59/2M, Ayyarkadu, Erumaipatti, Edappady, Salem - 637102', 297, y);
-  y += 15;
-  ctx.fillText('Operating office: ACGCET Main Building, Karaikudi - 630003', 297, y);
-  
-  y += 25;
-  ctx.fillStyle = '#bdd7ee';
-  ctx.fillRect(30, y, 535, 25);
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 12px Arial, sans-serif';
-  ctx.fillText(`Pay Slip for the month of ${month} ${year}`, 297, y + 16);
-  
-  y += 40;
-  ctx.textAlign = 'left';
-  ctx.font = '11px Arial, sans-serif';
-  ctx.lineWidth = 1;
-  
-  // Employee details
-  const details = [
-    ['Name', employee['Name'] || '', 'UAN No', employee['UAN No'] || ''],
-    ['Emp ID', employee['Emp ID'] || '', 'ESI No', employee['ESI No'] || ''],
-    ['Designation', employee['Designation'] || '', 'CL Taken', employee['CL Taken'] || '0'],
-    ['DOJ', employee['DOJ'] || '', 'Balance CL', employee['Balance CL'] || '0'],
-    ['Total Payable Days', employee['Payable Days'] || '30', 'Loss of Pay', employee['Loss of Pay'] || '0']
-  ];
-  
-  details.forEach(row => {
-    ctx.strokeStyle = '#000000';
-    ctx.strokeRect(30, y, 535, 20);
-    ctx.fillStyle = '#000000';
-    ctx.font = 'bold 11px Arial, sans-serif';
-    ctx.fillText(row[0] + ':', 35, y + 14);
-    ctx.font = '11px Arial, sans-serif';
-    ctx.fillText(row[1], 150, y + 14);
-    ctx.font = 'bold 11px Arial, sans-serif';
-    ctx.fillText(row[2] + ':', 300, y + 14);
-    ctx.font = '11px Arial, sans-serif';
-    ctx.fillText(row[3], 415, y + 14);
-    y += 20;
-  });
-  
-  y += 10;
-  
-  // Salary table header
-  ctx.fillStyle = '#f2f2f2';
-  ctx.fillRect(30, y, 535, 25);
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 11px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('Details', 130, y + 16);
-  ctx.fillText('Gross Salary', 230, y + 16);
-  ctx.fillText('Earned Salary', 330, y + 16);
-  ctx.fillText('Deductions', 465, y + 16);
-  ctx.strokeStyle = '#000000';
-  ctx.strokeRect(30, y, 535, 25);
-  
-  y += 25;
-  ctx.textAlign = 'left';
-  ctx.font = '11px Arial, sans-serif';
-  
-  // Salary rows
-  const salaryRows = [
-    ['Basic Pay', `Rs.${basicPay}`, `Rs.${basicPay}`, `EPF Rs.${epf}`],
-    ['DA', `Rs.${da}`, `Rs.${da}`, `ESI Rs.${esi}`],
-    ['HRA', `Rs.${hra}`, `Rs.${hra}`, `Prof Tax Rs.${profTax}`],
-    ['Other allowance', `Rs.${otherAllowance}`, '', `Loan Rs.${loan}`],
-    ['Total', `Rs.${grossSalary}`, `Rs.${grossSalary}`, `Total Rs.${totalDeductions}`]
-  ];
-  
-  salaryRows.forEach(row => {
-    ctx.strokeStyle = '#000000';
-    ctx.strokeRect(30, y, 535, 20);
-    ctx.fillStyle = '#000000';
-    ctx.fillText(row[0], 35, y + 14);
-    ctx.fillText(row[1], 180, y + 14);
-    ctx.fillText(row[2], 280, y + 14);
-    ctx.fillText(row[3], 380, y + 14);
-    y += 20;
-  });
-  
-  y += 20;
-  ctx.font = 'bold 14px Arial, sans-serif';
-  ctx.fillStyle = '#000000';
-  ctx.fillText(`Net Pay: Rs.${netPay}`, 35, y);
-  
-  y += 30;
-  ctx.font = '10px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('"This is a System generated Pay slip. Hence, Signature is not required"', 297, y);
-  
-  // Convert to high-quality image and download
-  canvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Payslip_${employee['Name'] || 'Unknown'}_${month}_${year}.png`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, 'image/png', 1.0); // Maximum quality
-};
+
 
 // Simple browser print method
 export const generatePayslipPDF = (employee, month, year) => {
@@ -471,7 +244,6 @@ export const generateAllPayslips = (employees, month, year) => {
 };
 
 export const generateSinglePayslip = (employee, month, year) => {
-  console.log('Generating single payslip for:', employee);
   generatePayslipPDF(employee, month, year);
 };
 
@@ -487,19 +259,19 @@ export const downloadPayslipHTML = (employee, month, year) => {
   URL.revokeObjectURL(url);
 };
 
-// Method selector function
-export const generatePayslipByMethod = (employee, month, year, method = 'print') => {
-  switch(method) {
-    case 'print':
-      generatePayslipPDF(employee, month, year);
-      break;
-    case 'canvas':
-      generateCanvasPDF(employee, month, year);
-      break;
-    case 'html':
-      downloadPayslipHTML(employee, month, year);
-      break;
-    default:
-      generatePayslipPDF(employee, month, year);
-  }
+// Real PDF generation using html2pdf
+export const generateRealPDF = async (employee, month, year) => {
+  const html2pdf = (await import('html2pdf.js')).default;
+  const htmlContent = createPayslipHTML(employee, month, year);
+  
+  const opt = {
+    margin: 10,
+    filename: `Payslip_${employee['Name'] || 'Unknown'}_${month}_${year}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(htmlContent).save();
 };
+

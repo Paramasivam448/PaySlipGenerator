@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { generateSinglePayslip } from '../utils/pdfGenerator';
-import { generateCanvasPDF } from '../utils/pdfGenerator';
-import { downloadPayslipHTML } from '../utils/pdfGenerator';
+import { generateSinglePayslip, downloadPayslipHTML, generateRealPDF } from '../utils/pdfGenerator';
+
 
 const EmployeeTable = ({ employees, isDarkMode }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,17 +47,17 @@ const EmployeeTable = ({ employees, isDarkMode }) => {
     
     try {
       switch(pdfMethod) {
-        case 'print':
-          generateSinglePayslip(employee, empMonth, empYear);
-          break;
-        case 'canvas':
-          generateCanvasPDF(employee, empMonth, empYear);
+        case 'pdf':
+          generateRealPDF(employee, empMonth, empYear);
           break;
         case 'html':
           downloadPayslipHTML(employee, empMonth, empYear);
           break;
-        default:
+        case 'print':
           generateSinglePayslip(employee, empMonth, empYear);
+          break;
+        default:
+          generateRealPDF(employee, empMonth, empYear);
       }
       alert(`Generated payslip for ${employee.Name || 'employee'}`);
     } catch (error) {
@@ -102,7 +101,7 @@ const EmployeeTable = ({ employees, isDarkMode }) => {
             fontWeight: '600',
             fontSize: '14px'
           }}>
-            📄 PDF Method:
+            📥 Download Method:
           </label>
           <select
             value={pdfMethod}
@@ -118,9 +117,9 @@ const EmployeeTable = ({ employees, isDarkMode }) => {
               minWidth: '140px'
             }}
           >
+            <option value="pdf">📕 PDF Download</option>
             <option value="print">🖨️ Browser Print</option>
-            <option value="canvas">🎨 Canvas PNG</option>
-            <option value="html">📄 HTML Download</option>
+            <option value="html">🌐 HTML Download</option>
           </select>
         </div>
       </div>
