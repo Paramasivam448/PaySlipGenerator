@@ -1,4 +1,3 @@
-
 const createPayslipHTML = (employee, month, year) => {
   const basicPay = parseInt(employee['Basic Pay'] || 0);
   const da = parseInt(employee['DA'] || 0);
@@ -208,10 +207,6 @@ const createPayslipHTML = (employee, month, year) => {
   `;
 };
 
-
-
-
-
 // Simple browser print method
 export const generatePayslipPDF = (employee, month, year) => {
   try {
@@ -233,18 +228,6 @@ export const generatePayslipPDF = (employee, month, year) => {
     console.error("PDF Generation Error:", error);
     alert("Error generating PDF: " + error.message);
   }
-};
-
-export const generateAllPayslips = (employees, month, year) => {
-  employees.forEach((employee, index) => {
-    setTimeout(() => {
-      generatePayslipPDF(employee, month, year);
-    }, index * 1000);
-  });
-};
-
-export const generateSinglePayslip = (employee, month, year) => {
-  generatePayslipPDF(employee, month, year);
 };
 
 // Alternative: Direct HTML download
@@ -274,4 +257,17 @@ export const generateRealPDF = async (employee, month, year) => {
   
   html2pdf().set(opt).from(htmlContent).save();
 };
+
+export const generateAllPayslips = (employees, month, year) => {
+  employees.forEach((employee, index) => {
+    setTimeout(() => {
+      generateRealPDF(employee, month, year);
+    }, index * 1000);
+  });
+};
+
+export const generateSinglePayslip = (employee, month, year) => {
+  generatePayslipPDF(employee, month, year);
+};
+
 
