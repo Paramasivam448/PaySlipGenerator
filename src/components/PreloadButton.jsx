@@ -4,11 +4,20 @@ const PreloadButton = ({ onDataLoaded, isDarkMode }) => {
   const handlePreload = async () => {
     try {
       console.log('Attempting to load Employee_Payslip_Data.xlsx...');
-      const { sheetNames } = await loadExcelFromPath('/Employee_Payslip_Data.xlsx');
+      const { sheetNames, loadSheetData } = await loadExcelFromPath('/Employee_Payslip_Data.xlsx');
       console.log('Loaded sheet names:', sheetNames);
       
       if (sheetNames && sheetNames.length > 0) {
-        onDataLoaded({ sheetNames });
+        // Auto-select first sheet and load its data
+        const firstSheet = sheetNames[0];
+        const firstSheetData = loadSheetData(firstSheet);
+        
+        onDataLoaded({ 
+          sheetNames, 
+          employees: firstSheetData.employees,
+          selectedSheet: firstSheet,
+          source: 'preloaded'
+        });
         alert(`Loaded Excel file with ${sheetNames.length} sheet(s): ${sheetNames.join(', ')}`);
       } else {
         alert('Excel file has no sheets');

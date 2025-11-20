@@ -11,7 +11,10 @@ export const parseExcelFileForSheets = (file) => {
       try {
         const data = new Uint8Array(e.target.result);
         globalWorkbook = XLSX.read(data, { type: 'array' });
-        resolve({ sheetNames: globalWorkbook.SheetNames });
+        resolve({ 
+          sheetNames: globalWorkbook.SheetNames,
+          parseSheetData
+        });
       } catch (error) {
         reject(error);
       }

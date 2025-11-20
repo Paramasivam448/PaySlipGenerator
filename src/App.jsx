@@ -12,6 +12,7 @@ function App() {
   const [sheetNames, setSheetNames] = useState([]);
   const [selectedSheet, setSelectedSheet] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [dataSource, setDataSource] = useState(''); // 'uploaded' or 'preloaded'
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -19,6 +20,13 @@ function App() {
       setIsDarkMode(savedTheme === 'dark');
     }
   }, []);
+
+  useEffect(() => {
+  if (sheetNames.length && !selectedSheet) {
+    setSelectedSheet(sheetNames[0]);
+  }
+}, [sheetNames]);
+
 
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
@@ -45,13 +53,14 @@ function App() {
 
   const currentTheme = isDarkMode ? theme.dark : theme.light;
 
-  const handleDataParsed = ({ employees, sheetNames }) => {
+  const handleDataParsed = ({ employees, sheetNames, selectedSheet, source = 'uploaded' }) => {
     if (sheetNames) {
       setSheetNames(sheetNames);
-      if (sheetNames.length === 1) {
-        // Auto-select if only one sheet
-        setSelectedSheet(sheetNames[0]);
-      }
+      setEmployees([]);
+      setDataSource(source);
+      
+      const sheetToSelect = selectedSheet || sheetNames[0];
+      setSelectedSheet(sheetToSelect);
     }
     if (employees) {
       setEmployees(employees);
@@ -62,13 +71,9 @@ function App() {
     setSelectedSheet(sheetName);
     if (sheetName) {
       try {
-        // Try parseSheetData first (for uploaded files), then loadSheetData (for preloaded files)
-        let sheetData;
-        try {
-          sheetData = parseSheetData(sheetName);
-        } catch {
-          sheetData = loadSheetData(sheetName);
-        }
+        const sheetData = dataSource === 'uploaded' 
+          ? parseSheetData(sheetName) 
+          : loadSheetData(sheetName);
         setEmployees(sheetData.employees);
       } catch (error) {
         console.error('Error parsing sheet:', error);

@@ -1,4 +1,5 @@
 import { parseExcelFileForSheets } from '../utils/excelReader';
+import { clearPreloadedData } from '../utils/autoLoader';
 
 const FileUploader = ({ onDataParsed, isDarkMode }) => {
   const handleFileUpload = async (event) => {
@@ -6,8 +7,20 @@ const FileUploader = ({ onDataParsed, isDarkMode }) => {
     if (!file) return;
     
     try {
-      const { sheetNames } = await parseExcelFileForSheets(file);
-      onDataParsed({ sheetNames });
+      // Clear any preloaded data first
+      clearPreloadedData();
+      
+      const { sheetNames, parseSheetData } = await parseExcelFileForSheets(file);
+      
+      const firstSheet = sheetNames[0];
+      const firstSheetData = parseSheetData(firstSheet);
+      
+      onDataParsed({ 
+        sheetNames, 
+        employees: firstSheetData.employees,
+        selectedSheet: firstSheet,
+        source: 'uploaded'
+      });
     } catch (error) {
       alert('Error parsing file: ' + error.message);
     }

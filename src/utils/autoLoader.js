@@ -20,7 +20,10 @@ export const loadExcelFromPath = async (filePath) => {
     preloadedWorkbook = XLSX.read(arrayBuffer, { type: 'array' });
     
     console.log('Sheet names:', preloadedWorkbook.SheetNames);
-    return { sheetNames: preloadedWorkbook.SheetNames };
+    return { 
+      sheetNames: preloadedWorkbook.SheetNames,
+      loadSheetData
+    };
   } catch (error) {
     console.error('Error loading Excel file:', error);
     throw error;
@@ -45,4 +48,8 @@ export const loadSheetData = (sheetName) => {
   }
   
   return { employees: jsonData, month, year };
+};
+
+export const clearPreloadedData = () => {
+  preloadedWorkbook = null;
 };
