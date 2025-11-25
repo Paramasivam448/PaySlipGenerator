@@ -1,12 +1,47 @@
 const createPayslipHTML = (employee, month, year) => {
-  const basicPay = parseInt(employee['Basic Pay'] || 0);
-  const da = parseInt(employee['DA'] || 0);
-  const hra = parseInt(employee['HRA'] || 0);
-  const otherAllowance = parseInt(employee['Other allowance'] || 0);
-  const epf = parseInt(employee['EPF'] || 0);
-  const profTax = parseInt(employee['Professional Tax'] || 0);
-  const loan = parseInt(employee['Loan Recovery'] || 0);
-  const esi = parseInt(employee['ESI / Health Insurance'] || 0);
+  // Helper function to safely get numeric values with fallbacks
+  const getNumericValue = (employee, possibleKeys, defaultValue = 0) => {
+    for (const key of possibleKeys) {
+      if (employee[key] !== undefined && employee[key] !== null && employee[key] !== '') {
+        const value = parseInt(employee[key]);
+        if (!isNaN(value)) return value;
+      }
+    }
+    return defaultValue;
+  };
+  
+  // Helper function to safely get string values with fallbacks
+  const getStringValue = (employee, possibleKeys, defaultValue = '') => {
+    for (const key of possibleKeys) {
+      if (employee[key] !== undefined && employee[key] !== null && employee[key] !== '') {
+        return employee[key].toString();
+      }
+    }
+    return defaultValue;
+  };
+  
+  const basicPay = getNumericValue(employee, ['Basic Pay', 'Basic Salary', 'Basic']);
+  const da = getNumericValue(employee, ['DA', 'Dearness Allowance']);
+  const hra = getNumericValue(employee, ['HRA', 'House Rent Allowance']);
+  const otherAllowance = getNumericValue(employee, ['Other allowance', 'Other Allowance', 'Additional Allowance']);
+  const epf = getNumericValue(employee, ['EPF', 'Employee Provident Fund', 'PF']);
+  const profTax = getNumericValue(employee, ['Professional Tax', 'Prof Tax', 'PT']);
+  const loan = getNumericValue(employee, ['Loan Recovery', 'Loan', 'Advance Recovery']);
+  const esi = getNumericValue(employee, ['ESI / Health Insurance', 'ESI', 'Health Insurance']);
+  
+  // Handle different possible column names for Total Payable Days
+  const totalPayableDays = getNumericValue(employee, ['Total Payable Days', 'Payable Days', 'Working Days', 'Total Days'], 30);
+  
+  // Handle other employee details with fallbacks
+  const employeeName = getStringValue(employee, ['Name', 'Employee Name', 'Emp Name']);
+  const empId = getStringValue(employee, ['Emp ID', 'Employee ID', 'ID']);
+  const designation = getStringValue(employee, ['Designation', 'Position', 'Job Title']);
+  const doj = getStringValue(employee, ['DOJ', 'Date of Joining', 'Joining Date']);
+  const uanNo = getStringValue(employee, ['UAN No', 'UAN', 'UAN Number']);
+  const esiNo = getStringValue(employee, ['ESI No', 'ESI Number']);
+  const clTaken = getStringValue(employee, ['CL Taken', 'Casual Leave Taken', 'Leave Taken'], '0');
+  const balanceCL = getStringValue(employee, ['Balance CL', 'Balance Casual Leave', 'Remaining CL'], '0');
+  const lossOfPay = getStringValue(employee, ['Loss of Pay', 'LOP', 'Loss Pay'], '0');
   
   const grossSalary = basicPay + da + hra + otherAllowance;
   const totalDeductions = epf + profTax + esi + loan;
@@ -112,33 +147,33 @@ const createPayslipHTML = (employee, month, year) => {
     <table>
       <tr>
         <td style="width: 22%;"><b>Name</b></td>
-        <td style="width: 35%;">${employee['Name'] || ''}</td>
+        <td style="width: 35%;">${employeeName}</td>
         <td><b>UAN No</b></td>
-        <td style="width: 16%;">${employee['UAN No'] || ''}</td>
+        <td style="width: 16%;">${uanNo}</td>
       </tr>
       <tr>
         <td><b>Emp ID</b></td>
-        <td>${employee['Emp ID'] || ''}</td>
+        <td>${empId}</td>
         <td><b>ESI No</b></td>
-        <td>${employee['ESI No'] || ''}</td>
+        <td>${esiNo}</td>
       </tr>
       <tr>
         <td><b>Designation</b></td>
-        <td>${employee['Designation'] || ''}</td>
+        <td>${designation}</td>
         <td><b>CL Taken</b></td>
-        <td>${employee['CL Taken'] || '0'}</td>
+        <td>${clTaken}</td>
       </tr>
       <tr>
         <td><b>DOJ</b></td>
-        <td>${employee['DOJ'] || ''}</td>
+        <td>${doj}</td>
         <td><b>Balance CL</b></td>
-        <td>${employee['Balance CL'] || '0'}</td>
+        <td>${balanceCL}</td>
       </tr>
       <tr>
         <td><b>Total Payable Days</b></td>
-        <td>${employee['Payable Days'] || '30'}</td>
+        <td>${totalPayableDays}</td>
         <td><b>Loss of Pay</b></td>
-        <td>${employee['Loss of Pay'] || '0'}</td>
+        <td>${lossOfPay}</td>
       </tr>
       <tr>
         <td colspan="4" style="padding:12px 0px"></td>
@@ -233,11 +268,12 @@ export const generatePayslipPDF = (employee, month, year) => {
 // Alternative: Direct HTML download
 export const downloadPayslipHTML = (employee, month, year) => {
   const htmlContent = createPayslipHTML(employee, month, year);
+  const employeeName = employee['Name'] || employee['Employee Name'] || employee['Emp Name'] || 'Unknown';
   const blob = new Blob([htmlContent], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `Payslip_${employee['Name'] || 'Unknown'}_${month}_${year}.html`;
+  a.download = `Payslip_${employeeName}_${month}_${year}.html`;
   a.click();
   URL.revokeObjectURL(url);
 };
@@ -246,10 +282,11 @@ export const downloadPayslipHTML = (employee, month, year) => {
 export const generateRealPDF = async (employee, month, year) => {
   const html2pdf = (await import('html2pdf.js')).default;
   const htmlContent = createPayslipHTML(employee, month, year);
+  const employeeName = employee['Name'] || employee['Employee Name'] || employee['Emp Name'] || 'Unknown';
   
   const opt = {
     margin: 10,
-    filename: `Payslip_${employee['Name'] || 'Unknown'}_${month}_${year}.pdf`,
+    filename: `Payslip_${employeeName}_${month}_${year}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -259,6 +296,27 @@ export const generateRealPDF = async (employee, month, year) => {
 };
 
 export const generateAllPayslips = (employees, month, year) => {
+  // Validate all employees first
+  const employeesWithIssues = [];
+  employees.forEach((employee, index) => {
+    const issues = validateEmployeeData(employee);
+    if (issues.length > 0) {
+      const employeeName = employee['Name'] || employee['Employee Name'] || employee['Emp Name'] || `Employee ${index + 1}`;
+      employeesWithIssues.push({ name: employeeName, issues });
+    }
+  });
+  
+  // Show summary of issues if any
+  if (employeesWithIssues.length > 0) {
+    const issuesSummary = employeesWithIssues.map(emp => 
+      `${emp.name}: ${emp.issues.join(', ')}`
+    ).join('\n');
+    
+    const proceed = confirm(`Data issues found for ${employeesWithIssues.length} employee(s):\n\n${issuesSummary}\n\nDo you want to proceed with generation?`);
+    if (!proceed) return;
+  }
+  
+  // Generate payslips with delay
   employees.forEach((employee, index) => {
     setTimeout(() => {
       generateRealPDF(employee, month, year);
@@ -266,7 +324,36 @@ export const generateAllPayslips = (employees, month, year) => {
   });
 };
 
+// Validation function to check for common data issues
+export const validateEmployeeData = (employee) => {
+  const issues = [];
+  
+  // Check for required fields
+  const employeeName = employee['Name'] || employee['Employee Name'] || employee['Emp Name'];
+  if (!employeeName) issues.push('Employee name is missing');
+  
+  const empId = employee['Emp ID'] || employee['Employee ID'] || employee['ID'];
+  if (!empId) issues.push('Employee ID is missing');
+  
+  // Check for numeric fields
+  const basicPay = parseInt(employee['Basic Pay'] || employee['Basic Salary'] || employee['Basic'] || 0);
+  if (basicPay <= 0) issues.push('Basic Pay is missing or invalid');
+  
+  const totalPayableDays = parseInt(employee['Total Payable Days'] || employee['Payable Days'] || employee['Working Days'] || 0);
+  if (totalPayableDays <= 0) issues.push('Total Payable Days is missing or invalid');
+  
+  return issues;
+};
+
 export const generateSinglePayslip = (employee, month, year) => {
+  // Validate data before generating
+  const issues = validateEmployeeData(employee);
+  if (issues.length > 0) {
+    const employeeName = employee['Name'] || employee['Employee Name'] || employee['Emp Name'] || 'Unknown';
+    console.warn(`Data issues found for ${employeeName}:`, issues);
+    alert(`Warning: Data issues found for ${employeeName}:\n${issues.join('\n')}\n\nPayslip will be generated with available data.`);
+  }
+  
   generatePayslipPDF(employee, month, year);
 };
 

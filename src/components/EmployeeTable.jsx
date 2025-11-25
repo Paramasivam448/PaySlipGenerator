@@ -59,7 +59,8 @@ const EmployeeTable = ({ employees, isDarkMode }) => {
         default:
           generateRealPDF(employee, empMonth, empYear);
       }
-      alert(`Generated payslip for ${employee.Name || 'employee'}`);
+      const employeeName = employee.Name || employee['Employee Name'] || employee['Emp Name'] || 'employee';
+      alert(`Generated payslip for ${employeeName}`);
     } catch (error) {
       console.error('Error in handleIndividualGenerate:', error);
       alert('Error generating payslip: ' + error.message);
