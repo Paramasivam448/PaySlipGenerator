@@ -1,9 +1,9 @@
 const createPayslipHTML = (employee, month, year) => {
-  // Helper function to safely get numeric values with fallbacks
+  // Helper function to safely get numeric values with fallbacks (supports decimals)
   const getNumericValue = (employee, possibleKeys, defaultValue = 0) => {
     for (const key of possibleKeys) {
       if (employee[key] !== undefined && employee[key] !== null && employee[key] !== '') {
-        const value = parseInt(employee[key]);
+        const value = parseFloat(employee[key]);
         if (!isNaN(value)) return value;
       }
     }
@@ -39,9 +39,9 @@ const createPayslipHTML = (employee, month, year) => {
   const doj = getStringValue(employee, ['DOJ', 'Date of Joining', 'Joining Date']);
   const uanNo = getStringValue(employee, ['UAN No', 'UAN', 'UAN Number']);
   const esiNo = getStringValue(employee, ['ESI No', 'ESI Number']);
-  const clTaken = getStringValue(employee, ['CL Taken', 'Casual Leave Taken', 'Leave Taken'], '0');
-  const balanceCL = getStringValue(employee, ['Balance CL', 'Balance Casual Leave', 'Remaining CL'], '0');
-  const lossOfPay = getStringValue(employee, ['Loss of Pay', 'LOP', 'Loss Pay'], '0');
+  const clTaken = getNumericValue(employee, ['CL Taken', 'Casual Leave Taken', 'Leave Taken'], 0);
+  const balanceCL = getNumericValue(employee, ['Balance CL', 'Balance Casual Leave', 'Remaining CL'], 0);
+  const lossOfPay = getNumericValue(employee, ['Loss of Pay', 'LOP', 'Loss Pay'], 0);
   
   const grossSalary = basicPay + da + hra + otherAllowance;
   const totalDeductions = epf + profTax + esi + loan;
@@ -336,10 +336,10 @@ export const validateEmployeeData = (employee) => {
   if (!empId) issues.push('Employee ID is missing');
   
   // Check for numeric fields
-  const basicPay = parseInt(employee['Basic Pay'] || employee['Basic Salary'] || employee['Basic'] || 0);
+  const basicPay = parseFloat(employee['Basic Pay'] || employee['Basic Salary'] || employee['Basic'] || 0);
   if (basicPay <= 0) issues.push('Basic Pay is missing or invalid');
   
-  const totalPayableDays = parseInt(employee['Total Payable Days'] || employee['Payable Days'] || employee['Working Days'] || 0);
+  const totalPayableDays = parseFloat(employee['Total Payable Days'] || employee['Payable Days'] || employee['Working Days'] || 0);
   if (totalPayableDays <= 0) issues.push('Total Payable Days is missing or invalid');
   
   return issues;
